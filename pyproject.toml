@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "codeql-postproc"
+version = "0.1.0"
+description = "A post processing tool for CodeQL databases and Sarif result files."
+authors = ["Remco Vermeulen <rvermeulen@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "codeql_postproc"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.3"
+pyyaml = "^6.0"
+jsonschema = "^4.17.3"
+
+[tool.poetry.scripts]
+codeql-postproc = 'codeql_postproc.cli:cli'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
