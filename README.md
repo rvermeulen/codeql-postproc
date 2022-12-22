@@ -30,9 +30,9 @@ codeql-postproc sarif add-vcs-provenance --from-database some-db.zip some-sarif.
 
 ### Query database metadata
 
-By default the CodeQL CLI add metadata to a database and the tool can be used to query those.
+By default the CodeQL CLI adds metadata to a database and the tool can be used to query those.
 
-For example, getting the language:
+For example, getting the target language:
 
 ```bash
 codeql-postproc database get-property primaryLanguage some-db.zip
