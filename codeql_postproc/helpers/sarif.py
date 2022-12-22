@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Any, cast, Dict
 import jsonschema
 import jsonschema.exceptions
-from importlib import resources
 
 class InvalidSarif(Exception):
     pass
