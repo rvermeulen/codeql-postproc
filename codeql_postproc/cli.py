@@ -17,7 +17,7 @@ def database() -> None:
 @click.option("-b", "--branch", required=True, help="The name of the branch containing the revision.")
 @click.argument("database", type=click.Path(exists=True, path_type=Path), required=True)
 def database_add_provenance(repository_uri: str, revision_id: str, branch: str, database: Path) -> None:
-    from helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
+    from codeql_postproc.helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
 
     try:
         codeql_db = CodeQLDatabase(database)
@@ -36,7 +36,7 @@ def database_add_provenance(repository_uri: str, revision_id: str, branch: str, 
 @click.argument("key", required=True)
 @click.argument("database", type=click.Path(exists=True, path_type=Path), required=True)
 def get_property(output_format: str, key: str, database: Path) -> None:
-    from helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
+    from codeql_postproc.helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
     import yaml
     import json
     import sys
@@ -70,8 +70,8 @@ def sarif() -> None:
 @click.argument("sarif_path", type=click.Path(exists=True, path_type=Path, dir_okay=False), required=True)
 @click.argument("database_path", type=click.Path(exists=True, path_type=Path), required=False)
 def sarif_add_provenance(from_database: bool, repository_uri: str, revision_id: str, branch: str, sarif_path: Path, database_path: Optional[Path]) -> None:
-    from helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
-    from helpers.sarif import Sarif, InvalidSarif
+    from codeql_postproc.helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
+    from codeql_postproc.helpers.sarif import Sarif, InvalidSarif
 
     if from_database and not database_path:
         raise click.BadArgumentUsage("A database must be specified when using the --from-database option!")
