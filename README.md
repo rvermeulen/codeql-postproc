@@ -11,7 +11,7 @@ Currently supports adding version control provenance information to databases an
 The tool supports both bundled (a zip archived database) and unbundled databases.
 
 ```bash
-codeql-postproc database add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c --branch main some-db.zip
+codeql-postproc database add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c main some-db.zip
 ```
 
 ### Adding version control provenance information to a sarif file
@@ -19,7 +19,7 @@ codeql-postproc database add-vcs-provenance --repository-uri https://github.com/
 The tool expects a Sarif file with v2.1.0.
 
 ```bash
-codeql-postproc sarif add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c --branch main some-sarif.sarif
+codeql-postproc sarif add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c some-sarif.sarif
 ```
 
 or from a database with provenance information
