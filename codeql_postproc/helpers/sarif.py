@@ -20,7 +20,7 @@ class Sarif:
         except json.decoder.JSONDecodeError:
             raise InvalidSarif("Invalid JSON file!")
 
-    def add_version_control_provenance(self, repository_url: str, revision_id: str, branch: str) -> None:
+    def add_version_control_provenance(self, repository_url: str, revision_id: str) -> None:
         if not "runs" in self.content or len(self.content["runs"]) == 0:
             raise InvalidSarif("Missing or no run objects in 'runs' property!")
 
@@ -34,8 +34,7 @@ class Sarif:
         
             cast(List[Dict[str, str]], run["versionControlProvenance"]).append({
                 "repositoryUri": repository_url,
-                "revisionId": revision_id,
-                "branch": branch
+                "revisionId": revision_id
             })
 
         try:

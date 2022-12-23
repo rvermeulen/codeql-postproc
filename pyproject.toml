@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codeql-postproc"
-version = "0.1.0"
+version = "0.2.0"
 description = "A post processing tool for CodeQL databases and Sarif result files."
 authors = ["Remco Vermeulen <rvermeulen@users.noreply.github.com>"]
 license = "MIT"

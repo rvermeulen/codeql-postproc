@@ -14,19 +14,17 @@ def database() -> None:
 @database.command("add-vcs-provenance")
 @click.option("-u", "--repository-uri", required=True, help="An absolute URI that specifies the location of the repository.")
 @click.option("-r", "--revision-id", required=True, help="A string that uniquely and permanently identifies the revision.")
-@click.option("-b", "--branch", required=True, help="The name of the branch containing the revision.")
 @click.argument("database", type=click.Path(exists=True, path_type=Path), required=True)
-def database_add_provenance(repository_uri: str, revision_id: str, branch: str, database: Path) -> None:
+def database_add_provenance(repository_uri: str, revision_id: str, database: Path) -> None:
     from codeql_postproc.helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
 
     try:
         codeql_db = CodeQLDatabase(database)
         vcs_provenance = [{
             'repositoryUri': repository_uri,
-            'revisionId': revision_id,
-            'branch': branch
+            'revisionId': revision_id
         }]
-        codeql_db.set_property(versionControlProvenance= vcs_provenance)
+        codeql_db.set_property(versionControlProvenance=vcs_provenance)
     except InvalidCodeQLDatabase as e:
         click.echo(e, err=True)
         exit(1)
@@ -66,10 +64,9 @@ def sarif() -> None:
 @click.option("-d", "--from-database", is_flag=True)
 @click.option("-u", "--repository-uri", help="An absolute URI that specifies the location of the repository.")
 @click.option("-r", "--revision-id", help="A string that uniquely and permanently identifies the revision.")
-@click.option("-b", "--branch", help="The name of the branch containing the revision.")
 @click.argument("sarif_path", type=click.Path(exists=True, path_type=Path, dir_okay=False), required=True)
 @click.argument("database_path", type=click.Path(exists=True, path_type=Path), required=False)
-def sarif_add_provenance(from_database: bool, repository_uri: str, revision_id: str, branch: str, sarif_path: Path, database_path: Optional[Path]) -> None:
+def sarif_add_provenance(from_database: bool, repository_uri: str, revision_id: str, sarif_path: Path, database_path: Optional[Path]) -> None:
     from codeql_postproc.helpers.codeql import CodeQLDatabase, InvalidCodeQLDatabase
     from codeql_postproc.helpers.sarif import Sarif, InvalidSarif
 
@@ -80,8 +77,6 @@ def sarif_add_provenance(from_database: bool, repository_uri: str, revision_id: 
         raise click.BadOptionUsage("--repository-uri", "The option '--repository-uri' must be specified if not importing from a database!")
     if not from_database and not revision_id:
         raise click.BadOptionUsage("--revision-id", "The option '--revision-id' must be specified if not importing from a database!")
-    if not from_database and not branch:
-        raise click.BadOptionUsage("--branch", "The option '--branch' must be specified if not importing from a database!")
 
     if from_database:
         try:
@@ -96,10 +91,6 @@ def sarif_add_provenance(from_database: bool, repository_uri: str, revision_id: 
                 click.echo(f"The database's version control provenance misses the 'revisionId' property!", err=True)
                 exit(1)
             revision_id = vcp["revisionId"]
-            if not "branch" in vcp:
-                click.echo(f"The database's version control provenance misses the 'branch' property!", err=True)
-                exit(1)
-            branch = vcp["branch"]
         except KeyError:
             click.echo(f"The database does not have any version control provenance property.", err=True)
             exit(1)
@@ -109,7 +100,7 @@ def sarif_add_provenance(from_database: bool, repository_uri: str, revision_id: 
 
     try:
         sarif = Sarif(sarif_path)
-        sarif.add_version_control_provenance(repository_uri, revision_id, branch)
+        sarif.add_version_control_provenance(repository_uri, revision_id)
     except InvalidSarif as e:
         click.echo(f"Unable to process invalid Sarif file with reason: {e}")
         exit(1)
