@@ -42,5 +42,5 @@ class Sarif:
         except jsonschema.exceptions.ValidationError as e:
             raise InvalidSarif(f"Adding the version control provenance information results in an invalid Sarif file because {e.message}!")
         with self.path.open(mode="w") as fd:
-            json.dump(self.content, fd, indent=2)
+            json.dump(self.content, fd)
 
