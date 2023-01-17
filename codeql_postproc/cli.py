@@ -30,7 +30,7 @@ def database_add_provenance(repository_uri: str, revision_id: str, database: Pat
         exit(1)
 
 @database.command("get-property")
-@click.option("-f", "--format", "output_format", type=click.Choice(["json", "yaml"]), default="yaml")
+@click.option("-f", "--format", "output_format", type=click.Choice(["json", "yaml"]), default="json")
 @click.argument("key", required=True)
 @click.argument("database", type=click.Path(exists=True, path_type=Path), required=True)
 def get_property(output_format: str, key: str, database: Path) -> None:
