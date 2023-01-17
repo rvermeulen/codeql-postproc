@@ -1,8 +1,10 @@
 from pathlib import Path
 from zipfile import ZipFile, ZipInfo, is_zipfile
-from typing import Any
+from typing import Any, cast, List
+import re
 import yaml
 from tempfile import TemporaryDirectory
+from jsonpointer import JsonPointer
 
 class InvalidCodeQLDatabase(Exception):
     pass
@@ -70,30 +72,36 @@ class CodeQLDatabase:
                     for f in database.glob("**/*"):
                         fd.write(str(f), arcname=str(f.relative_to(tmp_dir)))
 
-    def get_property(self, key: str) -> Any:
-        if key in self.database_info:
-            return self.database_info[key]
+    def __translate_key(self, key: str) -> JsonPointer:
+        # Create a json pointer from key by replacing '.' with '/' and array accesses with json pointer syntax.
+        # Example: "foo.bar[0].baz" -> "/foo/bar/0/baz"
+        path = re.sub(r"\[(\d+)\]", r"/\1", key.replace(".", "/"))
+        if not path.startswith("/"):
+            path = "/" + path
+        return JsonPointer(path)
+        
 
+    def get_property(self, key: str) -> Any:
+
+        database_property = self.__translate_key(key).get(self.database_info, default=None)
+        if database_property is not None:
+            return database_property
+
+        user_properties = None
         if self.database.is_dir():
-            user_properties = self.database / "user-properties.yml"
-            if user_properties.exists():
-                with user_properties.open() as fd:
-                    props = yaml.safe_load(fd)
-                    if key in props:
-                        return props[key]
-                    
-            raise KeyError("The property with key {key} doesn't exists!")
+            user_properties_path = self.database / "user-properties.yml"
+            if user_properties_path.exists():
+                with user_properties_path.open() as fd:
+                    user_properties = yaml.safe_load(fd)
         else:
             def is_user_property_file(zi: ZipInfo) -> bool:
                 return zi.filename.endswith("user-properties.yml")
             with ZipFile(str(self.database)) as fd:
                 user_property_candidates = list(filter(is_user_property_file, fd.infolist()))
                 if len(user_property_candidates) == 0:
-                    raise KeyError("The property with key {key} doesn't exists!")
+                    raise InvalidCodeQLDatabase("Found no 'user-properties.yml' files!")
                 if len(user_property_candidates) > 1:
                     raise InvalidCodeQLDatabase("Found multiple 'user-properties.yml' files!")
-                props = yaml.safe_load(fd.read(user_property_candidates[0]))
-                if key in props:
-                    return props[key]
-                else:
-                    raise KeyError("The property with key {key} doesn't exists!")
+                user_properties = yaml.safe_load(fd.read(user_property_candidates[0]))
+        return self.__translate_key(key).get(user_properties, default=None)
+    
