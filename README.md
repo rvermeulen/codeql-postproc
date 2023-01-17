@@ -11,7 +11,7 @@ Currently supports adding version control provenance information to databases an
 The tool supports both bundled (a zip archived database) and unbundled databases.
 
 ```bash
-codeql-postproc database add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c main some-db.zip
+codeql-postproc database add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c main <database>[.zip]
 ```
 
 ### Adding version control provenance information to a sarif file
@@ -19,29 +19,45 @@ codeql-postproc database add-vcs-provenance --repository-uri https://github.com/
 The tool expects a Sarif file with v2.1.0.
 
 ```bash
-codeql-postproc sarif add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c some-sarif.sarif
+codeql-postproc sarif add-vcs-provenance --repository-uri https://github.com/rvermeulen/codeql-postproc --revision-id 0b3ee0ba4e2972da7b8f95e53cf1abe2e5d0b35c <sarif>
 ```
 
 or from a database with provenance information
 
 ```bash
-codeql-postproc sarif add-vcs-provenance --from-database some-db.zip some-sarif.sarif
+codeql-postproc sarif add-vcs-provenance --from-database <database>[.zip] <sarif>
 ```
 
-### Query database metadata
+### Database properties
 
-By default the CodeQL CLI adds metadata to a database and the tool can be used to query those.
+The tool provides the command `database get-property` to query the database meta data and user properties (currently only the version control provenance is supported through this tool).
+Here are some examples of querying for database properties:
 
-For example, getting the target language:
+- Database target language.
 
-```bash
-codeql-postproc database get-property primaryLanguage some-db.zip
-```
+    ```bash
+    codeql-postproc database get-property primaryLanguage <database>[.zip]
+    ```
 
-or creation metadata:
+- Database meta data.
 
-```bash
-codeql-postproc database get-property creationMetaData some-db.zip
-```
+    ```bash
+    codeql-postproc database get-property creationMetadata <database>[.zip]
+    ```
 
-By default the tool outputs YAML, but the option `--format json` can be used to output JSON.
+To get nested properties use the `.` character to index dictionaries and the `[0]` to index arrays.
+Here are some examples of querying nested database properties:
+
+- CLI version part of the database meta data.
+
+    ```bash
+    codeql-postproc database get-property creationMetadata.cliVersion <database>[.zip]
+    ```
+
+- The `revisionId` part of the first element of the `versionControlProvenance` array.
+
+    ```bash
+    codeql-postproc database get-property 'versionControlProvenance[0].revisionId' <database>[.zip]
+    ```
+
+By default the tool outputs JSON, but the option `--format YAML` can be used to output YAML.
